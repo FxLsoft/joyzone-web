@@ -15,3 +15,14 @@ export const batchRemoveUser = params => { return axios.get(`${base}/user/batchr
 export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
 
 export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
+
+/**
+    pageNum	    是	页数
+    pageSize	是	条数
+    type	    否	0 建议 1 吐槽
+    startTime	否	开始时间
+    endTime	    否	结束时间
+ */
+export const getForumList = params => {
+    return axios.get(`${base}/forum/getForumList`, {params});
+}
