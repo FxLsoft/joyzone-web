@@ -1,6 +1,6 @@
 <template>
-	<el-form ref="form" :model="form" label-width="80px" @submit.prevent="onSubmit" class="form">
-		<el-form-item label="活动名称">
+    <el-form ref="form" :model="form" label-width="80px" @submit.prevent="onSubmit" class="form">
+        <el-form-item label="活动名称">
 			<el-input v-model="form.name"></el-input>
 		</el-form-item>
 		<el-form-item label="活动区域">
@@ -40,16 +40,18 @@
 		</el-form-item>
 		<el-form-item>
 			<el-button type="primary">立即创建</el-button>
-			<el-button @click.native.prevent>取消</el-button>
+			<el-button @click.native.prevent="handleCancel">取消</el-button>
 		</el-form-item>
-	</el-form>
+    </el-form>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				form: {
+    import Model from '@/model/Forum';
+    export default {
+        name: 'role-form',
+        data() {
+            return {
+                form: {
 					name: '',
 					region: '',
 					date1: '',
@@ -59,15 +61,18 @@
 					resource: '',
 					desc: ''
 				}
-			}
-		},
-		methods: {
-			onSubmit() {
-				console.log('submit!');
-			}
-		}
-	}
+            }
+        },
+        methods: {
+            // 提交保存
+            onSubmit() {
+                
+            },
+            handleCancel() {
 
+            }
+        },
+    }
 </script>
 
 <style lang="scss" scope>

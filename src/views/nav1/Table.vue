@@ -32,7 +32,7 @@
 			<el-table-column prop="addr" label="地址" min-width="180" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
-				<template scope="scope">
+				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -153,7 +153,6 @@
 					birth: '',
 					addr: ''
 				}
-
 			}
 		},
 		methods: {
@@ -162,6 +161,7 @@
 				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
 			},
 			handleCurrentChange(val) {
+				console.log(val);
 				this.page = val;
 				this.getUsers();
 			},

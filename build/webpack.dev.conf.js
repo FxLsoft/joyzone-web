@@ -15,6 +15,15 @@ module.exports = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
+  devServer: {
+    proxy: {
+        '/': {
+            target: 'http://47.106.39.130:6006',
+            changeOrigin: true,
+            secure: false,
+        },
+    }
+  },
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
   plugins: [
