@@ -9,8 +9,6 @@ import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
-import RoleList from './views/system/role/list';
-import RoleForm from './views/system/role/form';
 
 let routes = [
     {
@@ -31,8 +29,16 @@ let routes = [
         name: '系统设置',
         iconCls: 'el-icon-setting',
         children: [
-            { path: '/role', component: RoleList, name: '系统角色' },
-            { path: '/user', component: RoleForm, name: '系统用户' },
+            { 
+                path: '/role',
+                component: () => import('@/views/system/role/list'),
+                name: '系统角色'
+            },
+            {
+                path: '/user',
+                component: () => import('@/views/system/role/form'),
+                name: '系统用户'
+            },
         ]
     },
     {

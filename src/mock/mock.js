@@ -1,7 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { LoginUsers, Users } from './data/user';
-import Mock from 'mockjs';
 import Forum from '../model/Forum';
 import Result from '../model/Result';
 
@@ -30,19 +29,19 @@ export default {
             return new Promise((resolve, reject) => {
                 let user = null;
                 setTimeout(() => {
-                let hasUser = LoginUsers.some(u => {
-                    if (u.username === username && u.password === password) {
-                    user = JSON.parse(JSON.stringify(u));
-                    user.password = undefined;
-                    return true;
-                    }
-                });
+                    let hasUser = LoginUsers.some(u => {
+                        if (u.username === username && u.password === password) {
+                        user = JSON.parse(JSON.stringify(u));
+                        user.password = undefined;
+                        return true;
+                        }
+                    });
 
-                if (hasUser) {
-                    resolve([200, { code: 200, msg: '请求成功', user }]);
-                } else {
-                    resolve([200, { code: 500, msg: '账号或密码错误' }]);
-                }
+                    if (hasUser) {
+                        resolve([200, { code: 200, msg: '请求成功', user }]);
+                    } else {
+                        resolve([200, { code: 500, msg: '账号或密码错误' }]);
+                    }
                 }, 1000);
             });
         });
@@ -155,13 +154,18 @@ export default {
         });
 
         mock.onGet('/forum/getForumList').reply(config => {
+            let result = new Result();
             let out = [];
-            
+            for (let i = 0; i < 20; i++) {
+                out.push(new Forum());
+            }
+            result.data = out;
+            result.total = 100;
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    resolve([200, new Result(out)]);
-                }, 1000);
-            });
+                    resolve([200, result]);
+                }, 2000)
+            })
         })
     }
 };
