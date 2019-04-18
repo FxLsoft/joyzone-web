@@ -1,10 +1,13 @@
 <template>
-    <section>
+    <div class="form-page">
         <!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
 					<el-input v-model="filters.name" placeholder="名称"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-date-picker v-model="filters.dateRange" type="daterange" range-separator=" To " start-placeholder="Start date" end-placeholder="End date"></el-date-picker>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="queryList">查询</el-button>
@@ -41,7 +44,7 @@
 			<el-button type="danger" @click="batchDelete" :disabled="this.sels.length===0">批量删除</el-button>
 			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="total"></el-pagination>
 		</el-col>
-    </section>
+    </div>
 </template>
 
 <script>
@@ -52,7 +55,8 @@ export default {
         return {
 			isLoading: false,
             filters: {
-                name: ''
+				name: '',
+				dateRange: []
             },
 			list: [],
 			sels: [],

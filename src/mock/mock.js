@@ -156,7 +156,7 @@ export default {
         mock.onGet('/forum/getForumList').reply(config => {
             let result = new Result();
             let out = [];
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 10; i++) {
                 out.push(new Forum());
             }
             result.data = out;
