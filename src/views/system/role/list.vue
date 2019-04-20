@@ -72,8 +72,8 @@ export default {
         selectChange(sels) {
 			this.sels = sels;
 		},
-		handleEdit() {
-
+		handleEdit(index, row) {
+            
         },
         handleAdd() {
 
@@ -81,7 +81,7 @@ export default {
 		handleExport() {
 			http.exportForum();
 		},
-        handleDel() {
+        handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
 				let para = { id: row.id };

@@ -174,8 +174,8 @@
 				this.listLoading = true;
 				//NProgress.start();
 				getUserListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.users = res.data.users;
+					this.total = res.total;
+					this.users = res.users;
 					this.listLoading = false;
 					//NProgress.done();
 				});

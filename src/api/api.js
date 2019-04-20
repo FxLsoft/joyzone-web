@@ -1,15 +1,28 @@
 import axios from 'axios';
+import { Message } from 'element-ui';
 // http://47.106.39.130:6006/
 let base = '';
 
+axios.defaults.headers = {
+    // 'Content-type': 'application/x-www-form-urlencoded'
+}
+
 axios.interceptors.response.use(
     res => {
-        console.log(res);
-        return res.data;
+        let data = res.data;
+        console.log(data);
+        if (data.code != 0) {
+            Message.error(data.msg);
+            return Promise.reject(data);
+        }
+        return data;
     },
     error => {
-        console.log(res);
-        return Promise.reject(error);
+        let data = error.response.data;
+        console.log(data);
+        let errMsg = Object.prototype.toString.call(data).slice(8, -1) === 'Object' ? data.msg : data;
+        Message.error(errMsg);
+        return Promise.reject(data);
     }
 )
 
@@ -58,3 +71,34 @@ export const updateForum = params => {
     return axios.post(`${base}/forum/updateForum`, {params});
 }
 
+export const exportForum = (params) => {
+    window.open(`${base}/forum/exportForumModelXls`, '_blank');
+}
+
+export const login = (params) => {
+    return axios.get(`${base}/login/auth`, {params});
+}
+
+export const getSysUserList = (params) => {
+    return axios.post(`${base}/sysUser/list`, {params})
+}
+
+export const deleteSysUser = (ids) => {
+    return axios.post(`${base}/sysUser/delete`, {ids});
+}
+
+export const addSysUser = (params) => {
+    return axios.post(`${base}/sysUser/add`, params);
+}
+
+export const updateSysUser = (params) => {
+    return axios.post(`${base}/sysUser/update`, params);
+}
+
+export const getCustomerList = (params) => {
+    return axios.get(`${base}/user/getUserLis`, {params});
+}
+
+export const addCustomer = (params) => {
+    return axios.post(`${base}/user/saveUser`, params);
+}

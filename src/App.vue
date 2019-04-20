@@ -33,12 +33,16 @@ body {
 
 .el-submenu [class^=fa] {
 	vertical-align: baseline;
-	margin-right: 10px;
+    margin-right: 10px;
+    width: 24px;
+    text-align: center;
 }
 
 .el-menu-item [class^=fa] {
 	vertical-align: baseline;
-	margin-right: 10px;
+    margin-right: 10px;
+    width: 24px;
+    text-align: center;
 }
 
 .toolbar, .bottom-toolbar {

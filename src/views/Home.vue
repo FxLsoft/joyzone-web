@@ -78,7 +78,7 @@
 				sysName:'JOYZONE',
 				collapsed:false,
 				sysUserName: '',
-				sysUserAvatar: '',
+				sysUserAvatar: 'https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/user.png',
 				form: {
 					name: '',
 					region: '',

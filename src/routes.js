@@ -24,64 +24,148 @@ let routes = [
         hidden: true
     },
     {
-        path: '/system',
+        path: '/',
         component: Home,
         name: '系统设置',
-        iconCls: 'el-icon-setting',
+        iconCls: 'fa fa-cog',
         children: [
             { 
-                path: '/role',
-                component: () => import('@/views/system/role/list'),
-                name: '系统角色'
+                path: '/user',
+                component: () => import('@/views/system/user/list'),
+                name: '用户管理'
             },
             {
-                path: '/user',
+                path: '/role',
                 component: () => import('@/views/system/role/form'),
-                name: '系统用户'
+                name: '角色管理'
             },
         ]
     },
     {
         path: '/',
         component: Home,
-        name: '导航一',
-        iconCls: 'el-icon-message',//图标样式class
+        name: '普通用户管理',
+        iconCls: 'fa fa-user',
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: '列表' },
+            { 
+                path: '/common-user',
+                component: () => import('@/views/customer/list'),
+                name: '用户清单'
+            },
         ]
     },
     {
-        path: '/',
+        path: '/store',
         component: Home,
-        name: '导航二',
-        iconCls: 'fa fa-id-card-o',
+        name: '店家管理',
+        iconCls: 'fa fa-home',
         children: [
-            { path: '/page4', component: Page4, name: '页面4' },
-            { path: '/page5', component: Page5, name: '页面5' }
+            { 
+                path: '/user',
+                component: () => import('@/views/system/role/list'),
+                name: '店家清单'
+            },
+            { 
+                path: '/coupon',
+                component: () => import('@/views/system/role/list'),
+                name: '优惠券管理'
+            },
         ]
     },
     {
-        path: '/',
+        path: '/order',
         component: Home,
-        name: '',
+        name: '订单管理',
+        iconCls: 'fa fa-suitcase',
+        children: [
+            { 
+                path: '/user',
+                component: () => import('@/views/system/role/list'),
+                name: '店家清单'
+            },
+        ]
+    },
+    {
+        path: '/invitation',
+        component: Home,
+        name: '邀请函管理',
+        iconCls: 'fa fa-send',
+        children: [
+            { 
+                path: '/list',
+                component: () => import('@/views/system/role/list'),
+                name: '邀请函清单'
+            },
+        ]
+    },
+    {
+        path: '/forum',
+        component: Home,
+        name: '论坛管理',
+        iconCls: 'fa fa-forumbee',
+        children: [
+            { 
+                path: '/list',
+                component: () => import('@/views/system/role/list'),
+                name: '论坛清单'
+            },
+        ]
+    },
+    {
+        path: '/remark',
+        component: Home,
+        name: '备注',
         iconCls: 'fa fa-address-card',
         leaf: true,//只有一个节点
         children: [
-            { path: '/page6', component: Page6, name: '导航三' }
+            { 
+                path: '/list',
+                component: () => import('@/views/system/role/list'),
+                name: '备注'
+            },
         ]
     },
-    {
-        path: '/',
-        component: Home,
-        name: 'Charts',
-        iconCls: 'fa fa-bar-chart',
-        children: [
-            { path: '/echarts', component: echarts, name: 'echarts' }
-        ]
-    },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '导航一',
+    //     iconCls: 'el-icon-message',//图标样式class
+    //     children: [
+    //         { path: '/main', component: Main, name: '主页', hidden: true },
+    //         { path: '/table', component: Table, name: 'Table' },
+    //         { path: '/form', component: Form, name: 'Form' },
+    //         { path: '/user', component: user, name: '列表' },
+    //     ]
+    // },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '导航二',
+    //     iconCls: 'fa fa-id-card-o',
+    //     children: [
+    //         { path: '/page4', component: Page4, name: '页面4' },
+    //         { path: '/page5', component: Page5, name: '页面5' }
+    //     ]
+    // },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: '',
+    //     iconCls: 'fa fa-address-card',
+    //     leaf: true,//只有一个节点
+    //     children: [
+    //         { path: '/page6', component: Page6, name: '导航三' }
+    //     ]
+    // },
+    // {
+    //     path: '/',
+    //     component: Home,
+    //     name: 'Charts',
+    //     iconCls: 'fa fa-bar-chart',
+    //     children: [
+    //         { path: '/echarts', component: echarts, name: 'echarts' }
+    //     ]
+    // },
     {
         path: '*',
         hidden: true,
