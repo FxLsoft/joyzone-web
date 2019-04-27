@@ -81,7 +81,7 @@ let routes = [
             { 
                 path: '/user',
                 component: () => import('@/views/system/role/list'),
-                name: '店家清单'
+                name: '订单清单'
             },
         ]
     },

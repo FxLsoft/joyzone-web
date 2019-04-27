@@ -86,7 +86,7 @@
 					<el-input v-model="form.education"></el-input>
 				</el-form-item>
                 <el-form-item label="年龄">
-					<el-input-number v-model="form.age" min="1"></el-input-number>
+					<el-input-number v-model="form.age" :min="1"></el-input-number>
 				</el-form-item>
 				<el-form-item label="状态">
 					<el-radio-group v-model="form.status">
