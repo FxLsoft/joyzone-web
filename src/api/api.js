@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { Message } from 'element-ui';
 // http://47.106.39.130:6006/
 let base = '';
@@ -103,3 +104,23 @@ export const addCustomer = (params) => {
     return axios.post(`${base}/user/saveUser`, params);
 }
 
+
+/**
+ * 订单 ----
+ */
+// 后台订单列表
+export const getOrderList = (params) => {
+    return axios.get(`${base}/order/getOrderList`, {params});
+}
+
+export const getOrderDetail = (id) => {
+    return axios.get(`${base}/order/findById/${id}`);
+}
+
+export const getTeamUsers = (teamId, pageNum, pageSize) => {
+    return axios.get(`${base}/order/getTeamUsers/${teamId}/${pageNum}/${pageSize}`);
+}
+
+export const exportOrderXls = (params) => {
+   window.open(`${base}/order/exportOrderXls`, '_blank');
+}
