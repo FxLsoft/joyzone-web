@@ -23,19 +23,19 @@
         <!--列表-->
 		<el-table :data="list" highlight-current-row v-loading="isLoading" @selection-change="selectChange" style="width: 100%;">
 			<el-table-column type="selection" width="55"></el-table-column>
-			<el-table-column type="index" width="60"></el-table-column>
-			<el-table-column prop="name" label="用户名"></el-table-column>
-			<el-table-column prop="sex" label="性别" :formatter="formatSex"></el-table-column>
-			<el-table-column class-name="avatar-cell" label="头像">
-                <template slot-scope="{row}">
-                    <el-image :src="row.headImg" lazy></el-image>
-                </template>
-            </el-table-column>
-			<el-table-column prop="phone" label="联系方式" width="110"></el-table-column>
-			<el-table-column prop="status" label="用户状态" :formatter="formatStatus"></el-table-column>
-			<el-table-column prop="createTime" label="创建时间"></el-table-column>
+			<el-table-column type="index" width="40"></el-table-column>
+			<el-table-column prop="name" label="名称"></el-table-column>
+			<el-table-column prop="shopName" label="店家名称"></el-table-column>
+			<el-table-column prop="shopTypeName" label="店家种类名称"></el-table-column>
+			<el-table-column prop="price" label="折扣后的价格"></el-table-column>
+            <el-table-column prop="discount" label="折扣"></el-table-column>
+			<el-table-column prop="number" label="允许人数"></el-table-column>
+			<el-table-column prop="playTime" label="玩耍时间"></el-table-column>
+            <el-table-column prop="status" label="状态" :formatter="formatStatus"></el-table-column>
+            <el-table-column prop="startTime" label="开始时间"></el-table-column>
+            <el-table-column prop="endTime" label="结束时间"></el-table-column>
+            <el-table-column prop="createTime" label="创建时间"></el-table-column>
             <el-table-column prop="updateTime" label="更新时间"></el-table-column>
-            <el-table-column prop="lastLoginTime" label="最后登录时间"></el-table-column>
 			<el-table-column label="操作" width="150">
 				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -50,39 +50,34 @@
 		</el-col>
         <!--新增界面-->
 		<el-dialog :title="isAdd? '新增' : '编辑'" :visible.sync="formVisible" :close-on-click-modal="false">
-			<el-form :model="form" label-width="80px" :rules="formRules" ref="form">
-				<el-form-item label="姓名" prop="name">
+			<el-form :model="form" label-width="110px" :rules="formRules" ref="form">
+				<el-form-item label="体验券名称" prop="name">
 					<el-input v-model="form.name" auto-complete="off"></el-input>
 				</el-form-item>
-                <el-form-item label="密码" prop="password">
-					<el-input v-model="form.password" auto-complete="off"></el-input>
+                <el-form-item label="店家名称" prop="shopName">
+					<el-input v-model="form.shopName" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="form.sex">
-						<el-radio class="radio" :label="0">男</el-radio>
-						<el-radio class="radio" :label="1">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="头像">
-                    <el-upload
-                        class="avatar-uploader"
-                        action="/doc/uploadUserDoc"
-                        :show-file-list="false"
-                        :on-success="handleAvatarSuccess"
-                        :before-upload="beforeAvatarUpload">
-                        <img v-if="form.headImg" :src="form.headImg" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-				</el-form-item>
-				<el-form-item label="联系方式">
-					<el-input v-model="form.phone"></el-input>
-				</el-form-item>
-				<el-form-item label="状态">
+                <el-form-item label="折扣后的价格" prop="price">
+                    <el-input-number v-model="form.price" :precision="2" :step="0.1"></el-input-number>
+                </el-form-item>
+                <el-form-item label="折扣" prop="discount">
+                    <el-input-number v-model="form.discount" :min="0" :max="10"></el-input-number>
+                </el-form-item>
+                <el-form-item label="允许人数" prop="number">
+                    <el-input-number v-model="form.number" :min="0"></el-input-number>
+                </el-form-item>
+                <el-form-item label="玩耍时间" prop="playTime">
+                    <el-date-picker v-model="form.playTime" type="date" placeholder="选择日期"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="状态">
 					<el-radio-group v-model="form.status">
-						<el-radio class="radio" :label="0">激活</el-radio>
-						<el-radio class="radio" :label="1">禁用</el-radio>
+						<el-radio class="radio" :label="0">失效</el-radio>
+						<el-radio class="radio" :label="1">正常</el-radio>
 					</el-radio-group>
 				</el-form-item>
+                <el-form-item label="有效时间">
+                    <el-date-picker v-model="couponValidDate" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>
+                </el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="formVisible = false">取消</el-button>
@@ -99,12 +94,19 @@ const Model = function (vm = {}) {
     let _ = this;
     _.id = vm.id || '';
     _.name = vm.name || '';
-    _.password = vm.password || ''
-    _.shopId = vm.shopId || 0;
-    _.sex = vm.sex || 0;
-    _.headImg = vm.headImg || '';
-    _.phone = vm.phone || '';
-    _.status = vm.status || 0;
+    _.shopId = vm.shopId || '';
+    _.shopName = vm.shopName || ''
+    _.shopTypeId = vm.shopTypeId || '';
+    _.shopTypeName = vm.shopTypeName || '';
+    _.price = vm.price || 0;
+    _.discount = vm.discount;
+    _.number = vm.number || 0; // 限制人数
+    _.playTime = vm.playTime;
+    _.status = vm.status || 0; // 状态：0 失效 1 正常
+    _.createTime = vm.createTime;
+    _.updateTime = vm.updateTime; //
+    _.startTime = vm.startTime; // 开始时间
+    _.endTime = vm.endTime; // 结束时间
 }
 
 export default {
@@ -130,7 +132,9 @@ export default {
                 ]
             },
             //新增界面数据
-            form: new Model()
+            form: new Model(),
+
+            couponValidDate: []
         }
 	},
 	mounted() {
@@ -144,19 +148,21 @@ export default {
             this.form = new Model(row);
             this.formVisible = true;
             this.isAdd = false;
+            this.couponValidDate = [this.form.startTime, this.form.endTime];
         },
         handleAdd() {
             this.formVisible = true;
             this.isAdd = true;
             this.form = new Model();
+            this.couponValidDate = [this.form.startTime, this.form.endTime];
 		},
 		handleExport() {
-			http.exportForum();
+			http.exportShopDiscountCouponXls();
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteSysUser([row.id]).then((res) => {
+				http.deleteShopDiscountCoupon([row.id]).then((res) => {
 					this.isLoading = false;
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
@@ -170,7 +176,7 @@ export default {
 			let param = Object.assign({}, this.filters);
 			param.page = this.page;
 			param.pageSize = this.pageSize;
-			http.getSysUserList(param).then(res => {
+			http.getShopDiscountCouponList(param).then(res => {
 				if (res.code == 0) {
 					this.list = res.data || [];
 					this.total = res.total || this.list.length;
@@ -183,7 +189,7 @@ export default {
 			var ids = this.sels.map(item => item.id).toString();
 			this.$confirm('确认删除选中记录吗？', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteSysUser(ids).then((res) => {
+				http.deleteShopDiscountCoupon(ids).then((res) => {
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
 				}).finally(() => {
@@ -195,11 +201,21 @@ export default {
 			this.page = val;
 			this.queryList();
 		},
-		formatSex (row, column) {
-			return row.sex == 0 ? '男' : row.sex == 1 ? '女' : '未知';
+		formatType (row, column) {
+			var out = '-';
+            switch(row.type) {
+                case 0: out = '组队店';break;
+                case 1: out = '体验券店家';break;
+            }
+            return out;
 		},
         formatStatus(row, column) {
-            return row.status == 0 ? '激活' : row.status == 1 ? '禁用' : '-';
+            var out = '-';
+            switch(row.status) {
+                case 0: out = '失效';break;
+                case 1: out = '正常';break;
+            }
+            return out;
         },
         //新增
         addSubmit: function () {
@@ -207,8 +223,10 @@ export default {
                 if (valid) {
                     this.$confirm('确认提交吗？', '提示', {}).then(() => {
                         this.addLoading = true;
+                        this.form.startTime = this.couponValidDate[0];
+                        this.form.endTime = this.couponValidDate[1];
                         let para = Object.assign({}, this.form);
-                        http[!para.id ? 'addSysUser' : 'updateSysUser'](para).then((res) => {
+                        http[!para.id ? 'addShopDiscountCoupon' : 'updateShopDiscountCoupon'](para).then((res) => {
                             this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
@@ -222,51 +240,10 @@ export default {
                 }
             });
         },
-        handleAvatarSuccess(res, file) {
-            this.form.headImg = res.filePath;
-        },
-        beforeAvatarUpload(file) {
-            const isJPG = file.type === 'image/jpeg';
-            const isLt2M = file.size / 1024 / 1024 < 2;
-
-            if (!isJPG) {
-                this.$message.error('上传头像图片只能是 JPG 格式!');
-            }
-            if (!isLt2M) {
-                this.$message.error('上传头像图片大小不能超过 2MB!');
-            }
-            return isJPG && isLt2M;
-        }
     }
 }
 </script>
 
-<style lang="scss" scoped>
-    .el-image {
-        width: 40px;
-        height: 40px;
-    }
-    .avatar-uploader .el-upload {
-        border: 1px dashed #d9d9d9;
-        border-radius: 6px;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-    .avatar-uploader .el-upload:hover {
-        border-color: #409EFF;
-    }
-    .avatar-uploader-icon {
-        font-size: 28px;
-        color: #8c939d;
-        width: 178px;
-        height: 178px;
-        line-height: 178px;
-        text-align: center;
-    }
-    .avatar {
-        width: 178px;
-        height: 178px;
-        display: block;
-    }
+<style lang="scss">
+
 </style>

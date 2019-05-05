@@ -1,5 +1,5 @@
 <template>
-	<el-row class="container">
+	<el-row class="app-container">
 		<el-col :span="24" class="header">
 			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
 				{{collapsed?'':sysName}}
@@ -134,9 +134,9 @@
 
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 	@import '~scss_vars';
-	.container {
+	.app-container {
 		position: absolute;
 		top: 0px;
 		bottom: 0px;
@@ -249,6 +249,9 @@
 					box-sizing: border-box;
 				}
 			}
-		}
+        }
+        .el-table th {
+            padding: 0;
+        }
 	}
 </style>

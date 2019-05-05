@@ -48,31 +48,36 @@ let routes = [
         ]
     },
     {
-        path: '/store',
+        path: '/',
         component: Home,
         name: '店家管理',
         iconCls: 'fa fa-home',
         children: [
             { 
-                path: '/user',
-                component: () => import('@/views/system/role/list'),
+                path: '/store',
+                component: () => import('@/views/store/list'),
                 name: '店家清单'
             },
             { 
                 path: '/coupon',
-                component: () => import('@/views/system/role/list'),
-                name: '优惠券管理'
+                component: () => import('@/views/store/coupon'),
+                name: '体验券管理'
             },
+            {
+                path: '/discountCoupon',
+                component: () => import('@/views/store/discountCoupon'),
+                name: '折扣券管理'
+            }
         ]
     },
     {
-        path: '/order',
+        path: '/',
         component: Home,
         name: '订单管理',
         iconCls: 'fa fa-suitcase',
         children: [
             { 
-                path: '/user',
+                path: '/order',
                 component: () => import('@/views/system/role/list'),
                 name: '订单清单'
             },

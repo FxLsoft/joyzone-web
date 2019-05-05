@@ -1,14 +1,30 @@
 import axios from 'axios';
-
 import { Message } from 'element-ui';
-// http://47.106.39.130:6006/
-let base = '';
 
-axios.defaults.headers = {
-    // 'Content-type': 'application/x-www-form-urlencoded'
-}
+const service = axios.create({
+    baseURL: '',
+    timeout: 5000
+});
 
-axios.interceptors.response.use(
+service.interceptors.request.use(config => {
+    if (Object.prototype.toString.call(config.data).slice(8, -1) == 'Object') {
+        let ret = ''
+        for (let it in config.data) {
+            ret += encodeURIComponent(it) + '=' + encodeURIComponent(config.data[it]) + '&'
+        }
+        config.data = ret;
+    }
+        // 设置请求头
+    config.headers = {
+        'Content-Type': 'application/x-www-form-urlencoded', // 模拟form表单方式提交请求
+    }
+    return config
+}, error => {
+    console.log(error) // for debug
+    Promise.reject(error)
+});
+
+service.interceptors.response.use(
     res => {
         let data = res.data;
         console.log(data);
@@ -27,19 +43,19 @@ axios.interceptors.response.use(
     }
 )
 
-export const requestLogin = params => { return axios.post(`${base}/login`, params); };
+export const requestLogin = params => { return service.post(`/login`, params); };
 
-export const getUserList = params => { return axios.get(`${base}/user/list`, { params: params }); };
+export const getUserList = params => { return service.get(`/user/list`, { params: params }); };
 
-export const getUserListPage = params => { return axios.get(`${base}/user/listpage`, { params: params }); };
+export const getUserListPage = params => { return service.get(`/user/listpage`, { params: params }); };
 
-export const removeUser = params => { return axios.get(`${base}/user/remove`, { params: params }); };
+export const removeUser = params => { return service.get(`/user/remove`, { params: params }); };
 
-export const batchRemoveUser = params => { return axios.get(`${base}/user/batchremove`, { params: params }); };
+export const batchRemoveUser = params => { return service.get(`/user/batchremove`, { params: params }); };
 
-export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
+export const editUser = params => { return service.get(`/user/edit`, { params: params }); };
 
-export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
+export const addUser = params => { return service.get(`/user/add`, { params: params }); };
 
 /**
     pageNum	    是	页数
@@ -49,59 +65,59 @@ export const addUser = params => { return axios.get(`${base}/user/add`, { params
     endTime	    否	结束时间
  */
 export const getForumList = params => {
-    return axios.get(`${base}/forum/getForumList`, {params});
+    return service.get(`/forum/getForumList`, {params});
 }
 
 export const getForumById = id => {
-    return axios.get(`${base}/forum/getForumById`, {id});
+    return service.get(`/forum/getForumById`, {id});
 }
 
 export const deleteForum = params => {
-    return axios.get(`${base}/forum/deleteForum`, {params});
+    return service.get(`/forum/deleteForum`, {params});
 }
 
 export const batchDeleteForum = params => {
-    return axios.get(`${base}/forum/batchDeleteForum`, {params});
+    return service.get(`/forum/batchDeleteForum`, {params});
 }
 
 export const addForum = params => {
-    return axios.post(`${base}/forum/addForum`, {params});
+    return service.post(`/forum/addForum`, {params});
 }
 
 export const updateForum = params => {
-    return axios.post(`${base}/forum/updateForum`, {params});
+    return service.post(`/forum/updateForum`, {params});
 }
 
 export const exportForum = (params) => {
-    window.open(`${base}/forum/exportForumModelXls`, '_blank');
+    window.open(`/forum/exportForumModelXls`, '_blank');
 }
 
 export const login = (params) => {
-    return axios.get(`${base}/login/auth`, {params});
+    return service.post(`/login/auth`, params);
 }
 
 export const getSysUserList = (params) => {
-    return axios.post(`${base}/sysUser/list`, {params})
+    return service.post(`/sysUser/list`, params)
 }
 
 export const deleteSysUser = (ids) => {
-    return axios.post(`${base}/sysUser/delete`, {ids});
+    return service.post(`/sysUser/delete`, {ids});
 }
 
 export const addSysUser = (params) => {
-    return axios.post(`${base}/sysUser/add`, params);
+    return service.post(`/sysUser/add`, params);
 }
 
 export const updateSysUser = (params) => {
-    return axios.post(`${base}/sysUser/update`, params);
+    return service.post(`/sysUser/update`, params);
 }
 
 export const getCustomerList = (params) => {
-    return axios.get(`${base}/user/getUserLis`, {params});
+    return service.get(`/user/getUserLis`, {params});
 }
 
 export const addCustomer = (params) => {
-    return axios.post(`${base}/user/saveUser`, params);
+    return service.post(`/user/saveUser`, params);
 }
 
 
@@ -110,17 +126,83 @@ export const addCustomer = (params) => {
  */
 // 后台订单列表
 export const getOrderList = (params) => {
-    return axios.get(`${base}/order/getOrderList`, {params});
+    return service.get(`/order/getOrderList`, {params});
 }
 
-export const getOrderDetail = (id) => {
-    return axios.get(`${base}/order/findById/${id}`);
+export const getOrderById = (id) => {
+    return service.get(`/order/findById/${id}`);
 }
 
 export const getTeamUsers = (teamId, pageNum, pageSize) => {
-    return axios.get(`${base}/order/getTeamUsers/${teamId}/${pageNum}/${pageSize}`);
+    return service.get(`/order/getTeamUsers/${teamId}/${pageNum}/${pageSize}`);
 }
 
 export const exportOrderXls = (params) => {
-   window.open(`${base}/order/exportOrderXls`, '_blank');
+   window.open(`/order/exportOrderXls`, '_blank');
+}
+
+/**
+    商家
+ */
+export const getShopList = (params) => {
+    return service.get(`/shop/list`, {params});
+}
+
+export const deleteShop = (ids) => {
+    return service.post(`/shop/delete`, {ids});
+}
+
+export const addShop = (params) => {
+    return service.post(`/shop/add`, params);
+}
+
+export const updateShop = (params) => {
+    return service.post(`/shop/update`, params);
+}
+
+/**
+    后台店家体验券管理
+ */
+export const getShopCouponList = (params) => {
+    return service.get(`/shiopCoupon/getShopCouponList`, {params});
+}
+
+export const getShopCouponById = (id) => {
+    return service.get(`/shiopCoupon/selectById/${id}`);
+}
+
+export const addShopCoupon = (params) => {
+    return service.post(`/shiopCoupon/saveShopCoupon`, params);
+}
+
+export const updateShopCoupon = (params) => {
+    return service.post(`/shiopCoupon/updateCouponStatus`, params);
+}
+
+export const exportShopCouponXls = (params) => {
+   window.open(`/shiopCoupon/exportShopCouponXls`, '_blank');
+}
+
+/**
+    后台折扣券管理
+ */
+ export const getShopDiscountCouponList = (params) => {
+    return service.get(`/shopDiscount/getShopDiscountList`, {params});
+}
+
+
+export const getShopDiscountCouponById = (id) => {
+    return service.get(`/shopDiscount/selectById/${id}`);
+}
+
+export const addShopDiscountCoupon = (params) => {
+    return service.post(`/shopDiscount/saveShopDiscount`, params);
+}
+
+export const updateShopDiscountCoupon = (params) => {
+    return service.post(`/shopDiscount/saveShopDiscount`, params);
+}
+
+export const exportShopDiscountCouponXls = (params) => {
+   window.open(`/shopDiscount/exportShopDiscountXls`, '_blank');
 }

@@ -12,10 +12,11 @@
   "dependencies": {
     "axios": "^0.18.0",
     "echarts": "^3.3.2",
-    "element-ui": "^1.2.8",
+    "element-ui": "^2.8.2",
     "font-awesome": "^4.7.0",
     "nprogress": "^0.2.0",
     "vue": "^2.2.2",
+    "vue-amap": "^0.5.9",
     "vue-router": "^2.3.0",
     "vuex": "^2.0.0-rc.6"
   },
