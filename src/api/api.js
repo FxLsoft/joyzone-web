@@ -7,27 +7,26 @@ const service = axios.create({
 });
 
 service.interceptors.request.use(config => {
-    if (Object.prototype.toString.call(config.data).slice(8, -1) == 'Object') {
+    let param = config.data || config.params;
+    if (Object.prototype.toString.call(param).slice(8, -1) == 'Object') {
         let ret = ''
-        for (let it in config.data) {
-            ret += encodeURIComponent(it) + '=' + encodeURIComponent(config.data[it]) + '&'
+        for (let it in param) {
+            ret += encodeURIComponent(it) + '=' + encodeURIComponent(param[it]) + '&'
         }
         config.data = ret;
     }
-        // 设置请求头
+    // 设置请求头
     config.headers = {
         'Content-Type': 'application/x-www-form-urlencoded', // 模拟form表单方式提交请求
     }
     return config
 }, error => {
-    console.log(error) // for debug
     Promise.reject(error)
 });
 
 service.interceptors.response.use(
     res => {
         let data = res.data;
-        console.log(data);
         if (data.code != 0) {
             Message.error(data.msg);
             return Promise.reject(data);
@@ -36,7 +35,6 @@ service.interceptors.response.use(
     },
     error => {
         let data = error.response.data;
-        console.log(data);
         let errMsg = Object.prototype.toString.call(data).slice(8, -1) === 'Object' ? data.msg : data;
         Message.error(errMsg);
         return Promise.reject(data);
@@ -145,7 +143,7 @@ export const exportOrderXls = (params) => {
     商家
  */
 export const getShopList = (params) => {
-    return service.get(`/shop/list`, {params});
+    return service.post(`/shop/list`, params);
 }
 
 export const deleteShop = (ids) => {
@@ -205,4 +203,23 @@ export const updateShopDiscountCoupon = (params) => {
 
 export const exportShopDiscountCouponXls = (params) => {
    window.open(`/shopDiscount/exportShopDiscountXls`, '_blank');
+}
+
+export const getShopTypeList = (type) => {
+    return service.get(`/shopType/getShopTypeList`, {params: {type}});
+}
+
+/**
+    邀约
+ */
+export const getInviteList = (params) => {
+    return service.get(`/inviting/getInvitingList`, {params});
+}
+
+export const getInviteById = id => {
+    return service.get(`/inviting/findById/${id}`);
+}
+
+export const exportInviteXls = (params) => {
+   window.open(`/inviting/exportInvitingXls`, '_blank');
 }

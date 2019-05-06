@@ -21,13 +21,15 @@
 		<el-table :data="list" highlight-current-row v-loading="isLoading" @selection-change="selectChange" style="width: 100%;">
 			<el-table-column type="selection" width="55"></el-table-column>
 			<el-table-column type="index" width="40"></el-table-column>
-			<el-table-column prop="orderNo" label="订单编号"></el-table-column>
-			<el-table-column prop="orderType" label="订单类型" :formatter="formatType"></el-table-column>
+			<el-table-column prop="owner" label="发起人"></el-table-column>
 			<el-table-column prop="shopName" label="店家名称"></el-table-column>
-			<el-table-column prop="shopTypeName" label="店家类型名称"></el-table-column>
-			<el-table-column prop="personNum" label="参加人数"></el-table-column>
-			<el-table-column prop="price" label="订单价格"></el-table-column>
+			<el-table-column prop="address" label="地址"></el-table-column>
+			<el-table-column prop="content" label="主题"></el-table-column>
+			<el-table-column prop="type" label="邀请函标识"></el-table-column>
+			<el-table-column prop="invitingNum" label="邀请人数"></el-table-column>
             <el-table-column prop="status" label="状态" :formatter="formatStatus"></el-table-column>
+            <el-table-column prop="payWay" label="方式" :formatter="formatPayWay"></el-table-column>
+            <el-table-column prop="result" label="邀约成功状态" :formatter="formatResut"></el-table-column>
             <el-table-column prop="createTime" label="创建时间"></el-table-column>
             <el-table-column prop="updateTime" label="更新时间"></el-table-column>
 			<el-table-column label="操作" width="150">
@@ -43,34 +45,43 @@
 			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="total"></el-pagination>
 		</el-col>
         <!--新增界面-->
-		<el-dialog :title="'订单详情'" :visible.sync="formVisible" :close-on-click-modal="false">
+		<el-dialog :title="'详情'" :visible.sync="formVisible" :close-on-click-modal="false">
 			<el-form :model="form" label-width="110px" :rules="formRules" ref="form">
-				<el-form-item label="订单编号">
-					{{form.orderNo}}
-				</el-form-item>
-                <el-form-item label="订单类型">
-					{{formatType(form)}}
+				<el-form-item label="发起人">
+					{{form.owner}}
 				</el-form-item>
                 <el-form-item label="店家名称">
-                    {{form.shopName}}
+					{{form.shopName}}
+				</el-form-item>
+                <el-form-item label="地址">
+                    {{form.address}}
                 </el-form-item>
-                <el-form-item label="店家类型名称">
-                    {{form.shopTypeName}}
+                <el-form-item label="主题">
+                    {{form.content}}
                 </el-form-item>
-				<el-form-item label="参加人数">
-                    {{form.personNum}}
+				<el-form-item label="邀请函标识">
+                    {{form.type}}
                 </el-form-item>
-                <el-form-item label="订单价格">
-                    {{form.price}}
+                <el-form-item label="邀请人数">
+                    {{form.invitingNum}}
                 </el-form-item>
                 <el-form-item label="体验时间">
                     {{form.payTime}}
                 </el-form-item>
-                <el-form-item label="订单状态">
+                <el-form-item label="状态">
                     {{formatStatus(form)}}
                 </el-form-item>
-                <el-form-item label="组队详情">
-                    <img class="team-avatar" :src="user.headPic" :alt="user.userName" v-for="(user, index) in form.teamUsers" :key="index">
+                <el-form-item label="方式">
+                    {{formatPayWay(form)}}
+                </el-form-item>
+                <el-form-item label="邀约成功状态">
+                    {{formatResut(form)}}
+                </el-form-item>
+                <el-form-item label="开始时间">
+                    {{form.startTime}}
+                </el-form-item>
+                <el-form-item label="结束时间">
+                    {{form.endTime}}
                 </el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -122,16 +133,18 @@ export default {
 		},
 		handleView(index, row) {
             this.isLoading = true;
-            Promise.all([http.getOrderById(row.id), http.getTeamUsers(row.teamId, 1, 100)]).then(resArr => {
+           http.getInviteById(row.id).then(res => {
                 this.formVisible = true;
-                this.form = resArr[0].data;
-                this.form.teamUsers = resArr[1].data;
+                this.form = res.data;
             }).finally(() => {
                 this.isLoading = false;
             })
         },
 		handleExport() {
-			http.exportOrderXls();
+            let param = Object.assign({}, this.filters);
+			param.page = this.page;
+			param.pageSize = this.pageSize;
+			http.exportInviteXls(param);
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
@@ -150,7 +163,7 @@ export default {
 			let param = Object.assign({}, this.filters);
 			param.page = this.page;
 			param.pageSize = this.pageSize;
-			http.getOrderList(param).then(res => {
+			http.getInviteList(param).then(res => {
 				if (res.code == 0) {
 					this.list = res.data || [];
 					this.total = res.total || this.list.length;
@@ -175,11 +188,12 @@ export default {
 			this.page = val;
 			this.queryList();
 		},
-		formatType (row, column) {
+		formatPayWay (row, column) {
 			var out = '-';
-            switch(row.orderType) {
-                case 1: out = '组队店';break;
-                case 2: out = '体验券店家';break;
+            switch(row.payWay) {
+                case 0: out = 'AA';break;
+                case 1: out = '女生免费';break;
+                case 2: out = '赢家免费';break;
             }
             return out;
 		},
@@ -188,6 +202,14 @@ export default {
             switch(row.status) {
                 case 0: out = '失效';break;
                 case 1: out = '正常';break;
+            }
+            return out;
+        },
+        formatResut(row, column) {
+            var out = '-';
+            switch(row.result) {
+                case 0: out = '失败';break;
+                case 1: out = '成功';break;
             }
             return out;
         },

@@ -12,6 +12,9 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 })
 
 module.exports = merge(baseWebpackConfig, {
+    entry: {
+        test: './src/api/test'
+    },
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
@@ -37,7 +40,9 @@ module.exports = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      inject: true
+      inject: true,
+      chunksSortMode: 'manual',
+      chunks: ['app', 'common', 'test']
     }),
     new FriendlyErrorsPlugin()
   ]

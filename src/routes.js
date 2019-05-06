@@ -78,47 +78,47 @@ let routes = [
         children: [
             { 
                 path: '/order',
-                component: () => import('@/views/system/role/list'),
+                component: () => import('@/views/order/list'),
                 name: '订单清单'
             },
         ]
     },
     {
-        path: '/invitation',
+        path: '/',
         component: Home,
         name: '邀请函管理',
         iconCls: 'fa fa-send',
         children: [
             { 
-                path: '/list',
-                component: () => import('@/views/system/role/list'),
+                path: '/invite',
+                component: () => import('@/views/invite/list'),
                 name: '邀请函清单'
             },
         ]
     },
     {
-        path: '/forum',
+        path: '/',
         component: Home,
         name: '论坛管理',
         iconCls: 'fa fa-forumbee',
         children: [
             { 
-                path: '/list',
-                component: () => import('@/views/system/role/list'),
+                path: '/forum',
+                component: () => import('@/views/forum/list'),
                 name: '论坛清单'
             },
         ]
     },
     {
-        path: '/remark',
+        path: '/',
         component: Home,
         name: '备注',
         iconCls: 'fa fa-address-card',
         leaf: true,//只有一个节点
         children: [
             { 
-                path: '/list',
-                component: () => import('@/views/system/role/list'),
+                path: '/remark',
+                component: () => import('@/views/remark'),
                 name: '备注'
             },
         ]

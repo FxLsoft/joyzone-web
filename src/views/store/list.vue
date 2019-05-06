@@ -67,10 +67,15 @@
                 </el-form-item>
 				<el-form-item label="店家类型">
 					<el-radio-group v-model="form.type">
-						<el-radio class="radio" :label="0">组队店家</el-radio>
-						<el-radio class="radio" :label="1">体验券店家</el-radio>
+						<el-radio class="radio" :label="1">组队店家</el-radio>
+						<el-radio class="radio" :label="2">体验券店家</el-radio>
 					</el-radio-group>
 				</el-form-item>
+                <el-form-item label="店家种类">
+                    <el-select v-model="form.shopTypeId" filterable placeholder="请选择">
+                        <el-option v-for="item in shopType.typeSource" :key="item.id" :label="item.text" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="店家状态">
 					<el-radio-group v-model="form.status">
 						<el-radio class="radio" :label="0">签约</el-radio>
@@ -102,7 +107,7 @@
                 <el-form-item label="地址位置信息">
                     <div class="amap-wrapper">
                         <el-amap-search-box class="search-box" :search-option="mapOpt.searchOption" :on-search-result="mapOpt.onSearchResult"></el-amap-search-box>
-                        <el-amap class="amap-box" vid="amap-vue" :zoom="mapOpt.zoom" :center="mapOpt.center">
+                        <el-amap ref="map" class="amap-box" vid="amap-vue" :zoom="mapOpt.zoom" :center="mapOpt.center" :events="{click: mapClick}">
                             <el-amap-marker v-if="mapOpt.selectMarker" :position="mapOpt.selectMarker.position" :label="mapOpt.selectMarker.label"></el-amap-marker>
                         </el-amap>
                     </div>
@@ -132,13 +137,15 @@ const Model = function (vm = {}) {
     _.price = vm.price || 0;
     _.phone = vm.phone || '';
     _.status = vm.status || 0;
-    _.type = vm.type || 0; //0：组队店家，1：体验券店家
+    _.type = vm.type || 1; //1：组队店家，2：体验券店家
     _.coverImg = vm.coverImg || ''; // 店家封面照片
     _.status = vm.status || 0; // 店家状态；0：签约；1：待审核；2：已禁入
     _.regImg = vm.regImg || ''; // 工商注册照片
     _.legalPersonImg = vm.legalPersonImg || ''; // 法人信息照片
     _.createTime = vm.createTime;
     _.updateTime = vm.updateTime;
+    _.shopTypeId = vm.shopTypeId;
+    _.shopTypeName = vm.shopTypeName;
     _.lng = vm.lng;
     _.lat = vm.lat;
 }
@@ -183,7 +190,6 @@ export default {
                             label: p.address,
                             p
                         };
-                        this.mapOpt.center = [p.lng, p.lat];
                         this.getCityInfo(p.lng, p.lat);
                     }
                 },
@@ -191,6 +197,11 @@ export default {
                 selectMarker: null,
                 zoom: 14,
                 center: [114.305215, 30.592935]
+            },
+
+            shopType: {
+                loading: false,
+                typeSource: []
             }
         }
 	},
@@ -215,6 +226,8 @@ export default {
                     position: [this.form.lng, this.form.lat]
                 }
             }
+            this.initShopTypeSource();
+            console.log(this);
         },
         handleAdd() {
             this.formVisible = true;
@@ -227,14 +240,15 @@ export default {
                     position: [this.form.lng, this.form.lat]
                 }
             }
+            this.initShopTypeSource();
 		},
 		handleExport() {
-			http.exportShopCouponXls();
+			http.exportShopXls();
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteShopCoupon([row.id]).then((res) => {
+				http.deleteShop([row.id]).then((res) => {
 					this.isLoading = false;
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
@@ -248,7 +262,7 @@ export default {
 			let param = Object.assign({}, this.filters);
 			param.page = this.page;
 			param.pageSize = this.pageSize;
-			http.getShopCouponList(param).then(res => {
+			http.getShopList(param).then(res => {
 				if (res.code == 0) {
 					this.list = res.data || [];
 					this.total = res.total || this.list.length;
@@ -261,7 +275,7 @@ export default {
 			var ids = this.sels.map(item => item.id).toString();
 			this.$confirm('确认删除选中记录吗？', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteShopCoupon(ids).then((res) => {
+				http.deleteShop(ids).then((res) => {
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
 				}).finally(() => {
@@ -299,10 +313,10 @@ export default {
                         if (this.mapOpt.selectMarker) {
                             this.form.lng = this.mapOpt.selectMarker.position[0];
                             this.form.lat = this.mapOpt.selectMarker.position[1];
-                            // this.form.address = this.mapOpt.selectMarker.label;
+
                         }
                         let para = Object.assign({}, this.form);
-                        http[!para.id ? 'addShopCoupon' : 'updateShopCoupon'](para).then((res) => {
+                        http[!para.id ? 'addShop' : 'updateShop'](para).then((res) => {
                             this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
@@ -311,7 +325,9 @@ export default {
                             this.$refs['form'].resetFields();
                             this.formVisible = false;
                             this.queryList();
-                        });
+                        }).finally(() => {
+                            this.addLoading = false;
+                        })
                     });
                 }
             });
@@ -330,6 +346,7 @@ export default {
         },
         //获取用户所在城市信息
         getCityInfo(lng, lat) {
+            this.mapOpt.center = [lng, lat];
             AMap.service('AMap.Geocoder', () => {//回调函数
                 //实例化Geocoder
                 let geocoder = new AMap.Geocoder({
@@ -348,6 +365,26 @@ export default {
                     }else{ }
                 });
             })
+        },
+        mapClick(e) {
+            this.mapOpt.selectMarker = {
+                label: '',
+                position: [e.lnglat.lng, e.lnglat.lat]
+            }
+            this.getCityInfo(e.lnglat.lng, e.lnglat.lat);
+        },
+        initShopTypeSource() {
+            if (this.__formType != this.form.type) {
+                this.shopType.loading = true;
+                http.getShopTypeList(this.form.type).then(res => {
+                    this.shopType.typeSource = (res.data || []);
+                    this.__formType = this.form.type;
+                }).finally(() => {
+                    this.shopType.loading = false;
+                })
+            } else {
+                this.shopType.typeSource = [];
+            }
         }
     }
 }
@@ -362,6 +399,9 @@ export default {
             top: 10px;
             right: 25px;
             z-index: 999;
+        }
+        .el-vue-search-box-container {
+            height: 30px;
         }
     }
 </style>
