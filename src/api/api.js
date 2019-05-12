@@ -6,15 +6,20 @@ const service = axios.create({
     timeout: 5000
 });
 
-service.interceptors.request.use(config => {
-    let param = config.data || config.params;
+const parseQueryString = function(param) {
     if (Object.prototype.toString.call(param).slice(8, -1) == 'Object') {
         let ret = ''
         for (let it in param) {
             ret += encodeURIComponent(it) + '=' + encodeURIComponent(param[it]) + '&'
         }
-        config.data = ret;
+        return ret;
     }
+    return param;
+}
+
+service.interceptors.request.use(config => {
+    let param = config.data || config.params;
+    config.data = parseQueryString(param);
     // 设置请求头
     config.headers = {
         'Content-Type': 'application/x-www-form-urlencoded', // 模拟form表单方式提交请求
@@ -54,6 +59,8 @@ export const batchRemoveUser = params => { return service.get(`/user/batchremove
 export const editUser = params => { return service.get(`/user/edit`, { params: params }); };
 
 export const addUser = params => { return service.get(`/user/add`, { params: params }); };
+
+
 
 /**
     pageNum	    是	页数
@@ -110,6 +117,7 @@ export const updateSysUser = (params) => {
     return service.post(`/sysUser/update`, params);
 }
 
+
 export const getCustomerList = (params) => {
     return service.get(`/user/getUserLis`, {params});
 }
@@ -118,7 +126,13 @@ export const addCustomer = (params) => {
     return service.post(`/user/saveUser`, params);
 }
 
+export const deleteCustomer = (params) => {
+    return service.post(`/user/delUsers`, params);
+}
 
+export const exportCustomer = (params) => {
+    window.open(`/user/exportUserXls?${parseQueryString(params)}`, '_blank');
+}
 /**
  * 订单 ----
  */
@@ -136,7 +150,7 @@ export const getTeamUsers = (teamId, pageNum, pageSize) => {
 }
 
 export const exportOrderXls = (params) => {
-   window.open(`/order/exportOrderXls`, '_blank');
+   window.open(`/order/exportOrderXls?${parseQueryString(params)}`, '_blank');
 }
 
 /**
@@ -178,7 +192,7 @@ export const updateShopCoupon = (params) => {
 }
 
 export const exportShopCouponXls = (params) => {
-   window.open(`/shiopCoupon/exportShopCouponXls`, '_blank');
+   window.open(`/shiopCoupon/exportShopCouponXls?${parseQueryString(params)}`, '_blank');
 }
 
 /**
@@ -202,7 +216,7 @@ export const updateShopDiscountCoupon = (params) => {
 }
 
 export const exportShopDiscountCouponXls = (params) => {
-   window.open(`/shopDiscount/exportShopDiscountXls`, '_blank');
+   window.open(`/shopDiscount/exportShopDiscountXls?${parseQueryString(params)}`, '_blank');
 }
 
 export const getShopTypeList = (type) => {
@@ -221,5 +235,5 @@ export const getInviteById = id => {
 }
 
 export const exportInviteXls = (params) => {
-   window.open(`/inviting/exportInvitingXls`, '_blank');
+   window.open(`/inviting/exportInvitingXls?${parseQueryString(params)}`, '_blank');
 }

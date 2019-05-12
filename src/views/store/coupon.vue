@@ -57,9 +57,11 @@
 				<el-form-item label="体验券名称" prop="name">
 					<el-input v-model="form.name" auto-complete="off"></el-input>
 				</el-form-item>
-                <el-form-item label="店家名称" prop="shopName">
-					<el-input v-model="form.shopName" auto-complete="off"></el-input>
-				</el-form-item>
+                <el-form-item label="店家种类">
+                    <el-select v-model="form.shopTypeId" filterable placeholder="请选择">
+                        <el-option v-for="item in shopType.typeSource" :key="item.id" :label="item.text" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="体验券价格" prop="price">
                     <el-input-number v-model="form.price" :precision="2" :step="0.1"></el-input-number>
                 </el-form-item>
@@ -111,6 +113,7 @@ const Model = function (vm = {}) {
     _.updateTime = vm.updateTime; //
     _.startTime = vm.startTime; // 开始时间
     _.endTime = vm.endTime; // 结束时间
+    _.type = 1;
 }
 
 export default {
@@ -139,7 +142,11 @@ export default {
             form: new Model(),
 
 
-            couponValidDate: []
+            couponValidDate: [],
+            shopType: {
+                loading: false,
+                typeSource: []
+            }
         }
 	},
 	mounted() {
@@ -153,16 +160,21 @@ export default {
             this.form = new Model(row);
             this.formVisible = true;
             this.isAdd = false;
+            this.initShopTypeSource();
             this.couponValidDate = [this.form.startTime, this.form.endTime];
         },
         handleAdd() {
             this.formVisible = true;
             this.isAdd = true;
             this.form = new Model();
+            this.initShopTypeSource();
             this.couponValidDate = [this.form.startTime, this.form.endTime];
 		},
 		handleExport() {
-			http.exportShopCouponXls();
+            let param = Object.assign({}, this.filters);
+			param.page = this.page;
+			param.pageSize = this.pageSize;
+			http.exportShopCouponXls(param);
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
@@ -232,7 +244,6 @@ export default {
                         this.form.endTime = this.couponValidDate[1];
                         let para = Object.assign({}, this.form);
                         http[!para.id ? 'addShopCoupon' : 'updateShopCoupon'](para).then((res) => {
-                            this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
                                 type: 'success'
@@ -240,7 +251,9 @@ export default {
                             this.$refs['form'].resetFields();
                             this.formVisible = false;
                             this.queryList();
-                        });
+                        }).finally(() => {
+                            this.addLoading = false;
+                        })
                     });
                 }
             });
@@ -256,6 +269,19 @@ export default {
                 this.$message.error('上传头像图片大小不能超过 2MB!');
             }
             return isJPG && isLt2M;
+        },
+        initShopTypeSource() {
+            if (this.__formType != this.form.type) {
+                this.shopType.loading = true;
+                http.getShopTypeList(this.form.type).then(res => {
+                    this.shopType.typeSource = (res.data || []);
+                    this.__formType = this.form.type;
+                }).finally(() => {
+                    this.shopType.loading = false;
+                })
+            } else {
+                this.shopType.typeSource = [];
+            }
         }
     }
 }

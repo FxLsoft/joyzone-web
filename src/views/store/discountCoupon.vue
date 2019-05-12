@@ -51,9 +51,14 @@
         <!--新增界面-->
 		<el-dialog :title="isAdd? '新增' : '编辑'" :visible.sync="formVisible" :close-on-click-modal="false">
 			<el-form :model="form" label-width="110px" :rules="formRules" ref="form">
-				<el-form-item label="体验券名称" prop="name">
+				<el-form-item label="折扣券名称" prop="name">
 					<el-input v-model="form.name" auto-complete="off"></el-input>
 				</el-form-item>
+                <el-form-item label="店家种类">
+                    <el-select v-model="form.shopTypeId" filterable placeholder="请选择">
+                        <el-option v-for="item in shopType.typeSource" :key="item.id" :label="item.text" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="店家名称" prop="shopName">
 					<el-input v-model="form.shopName" auto-complete="off"></el-input>
 				</el-form-item>
@@ -107,6 +112,7 @@ const Model = function (vm = {}) {
     _.updateTime = vm.updateTime; //
     _.startTime = vm.startTime; // 开始时间
     _.endTime = vm.endTime; // 结束时间
+    _.type = 2;
 }
 
 export default {
@@ -134,7 +140,11 @@ export default {
             //新增界面数据
             form: new Model(),
 
-            couponValidDate: []
+            couponValidDate: [],
+            shopType: {
+                loading: false,
+                typeSource: []
+            }
         }
 	},
 	mounted() {
@@ -148,16 +158,21 @@ export default {
             this.form = new Model(row);
             this.formVisible = true;
             this.isAdd = false;
+            this.initShopTypeSource();
             this.couponValidDate = [this.form.startTime, this.form.endTime];
         },
         handleAdd() {
             this.formVisible = true;
             this.isAdd = true;
             this.form = new Model();
+            this.initShopTypeSource();
             this.couponValidDate = [this.form.startTime, this.form.endTime];
 		},
 		handleExport() {
-			http.exportShopDiscountCouponXls();
+            let param = Object.assign({}, this.filters);
+			param.page = this.page;
+			param.pageSize = this.pageSize;
+			http.exportShopDiscountCouponXls(param);
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
@@ -227,7 +242,6 @@ export default {
                         this.form.endTime = this.couponValidDate[1];
                         let para = Object.assign({}, this.form);
                         http[!para.id ? 'addShopDiscountCoupon' : 'updateShopDiscountCoupon'](para).then((res) => {
-                            this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
                                 type: 'success'
@@ -235,11 +249,26 @@ export default {
                             this.$refs['form'].resetFields();
                             this.formVisible = false;
                             this.queryList();
-                        });
+                        }).finally(() => {
+                            this.addLoading = false;
+                        })
                     });
                 }
             });
         },
+        initShopTypeSource() {
+            if (this.__formType != this.form.type) {
+                this.shopType.loading = true;
+                http.getShopTypeList(this.form.type).then(res => {
+                    this.shopType.typeSource = (res.data || []);
+                    this.__formType = this.form.type;
+                }).finally(() => {
+                    this.shopType.loading = false;
+                })
+            } else {
+                this.shopType.typeSource = [];
+            }
+        }
     }
 }
 </script>

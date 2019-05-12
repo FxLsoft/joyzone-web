@@ -100,7 +100,7 @@ const Model = function (vm = {}) {
     _.id = vm.id || '';
     _.name = vm.name || '';
     _.password = vm.password || ''
-    _.shopId = vm.shopId || 0;
+    _.shopId = vm.shopId || 1;
     _.sex = vm.sex || 0;
     _.headImg = vm.headImg || '';
     _.phone = vm.phone || '';
@@ -151,7 +151,10 @@ export default {
             this.form = new Model();
 		},
 		handleExport() {
-			http.exportForum();
+            let param = Object.assign({}, this.filters);
+			param.page = this.page;
+			param.pageSize = this.pageSize;
+			http.exportForum(param);
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
@@ -209,7 +212,6 @@ export default {
                         this.addLoading = true;
                         let para = Object.assign({}, this.form);
                         http[!para.id ? 'addSysUser' : 'updateSysUser'](para).then((res) => {
-                            this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
                                 type: 'success'
@@ -217,7 +219,9 @@ export default {
                             this.$refs['form'].resetFields();
                             this.formVisible = false;
                             this.queryList();
-                        });
+                        }).finally(() => {
+                            this.addLoading = false;
+                        })
                     });
                 }
             });
@@ -226,9 +230,9 @@ export default {
             this.form.headImg = res.filePath;
         },
         beforeAvatarUpload(file) {
-            const isJPG = file.type === 'image/jpeg';
+            const isJPG = /^image\/*/.test(file.type);
             const isLt2M = file.size / 1024 / 1024 < 2;
-
+            console.log(file.type);
             if (!isJPG) {
                 this.$message.error('上传头像图片只能是 JPG 格式!');
             }

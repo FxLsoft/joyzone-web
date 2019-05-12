@@ -29,7 +29,7 @@
             <el-table-column prop="phone" label="联系方式"></el-table-column>
             <el-table-column label="头像">
                 <template slot-scope="{row}">
-                    <img :src="row.headPic" class="avatar">
+                    <el-image :src="row.headPic" lazy></el-image>
                 </template>
             </el-table-column>
 			<el-table-column prop="sex" label="性别" :formatter="formatSex"></el-table-column>
@@ -53,7 +53,7 @@
 			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="total"></el-pagination>
 		</el-col>
         <!--新增界面-->
-		<el-dialog :title="isAdd? '新增' : '编辑'" v-model="formVisible" :close-on-click-modal="false">
+		<el-dialog :title="isAdd? '新增' : '编辑'" :visible.sync="formVisible" :close-on-click-modal="false">
 			<el-form :model="form" label-width="80px" :rules="formRules" ref="form">
 				<el-form-item label="姓名" prop="userName">
 					<el-input v-model="form.userName" auto-complete="off"></el-input>
@@ -73,8 +73,16 @@
 						<el-radio class="radio" :label="1">女</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="头像">
-					<el-input v-model="form.headPic"></el-input>
+                <el-form-item label="头像">
+                    <el-upload
+                        class="avatar-uploader"
+                        action="/doc/uploadUserDoc"
+                        :show-file-list="false"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                        <img v-if="form.headPic" :src="form.headPic" class="avatar">
+                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    </el-upload>
 				</el-form-item>
                 <el-form-item label="生日">
                     <el-date-picker v-model="form.birthday" type="date" placeholder="Pick a day"></el-date-picker>
@@ -167,12 +175,15 @@ export default {
             this.form = new Model();
 		},
 		handleExport() {
-			http.exportForum();
+            let param = Object.assign({}, this.filters);
+			param.page = this.page;
+			param.pageSize = this.pageSize;
+			http.exportCustomer(param);
 		},
         handleDel(index, row) {
 			this.$confirm('确认删除该记录吗?', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteSysUser([row.id]).then((res) => {
+				http.deleteCustomer([row.id]).then((res) => {
 					this.isLoading = false;
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
@@ -197,7 +208,7 @@ export default {
 			var ids = this.sels.map(item => item.id).toString();
 			this.$confirm('确认删除选中记录吗？', '提示', { type: 'warning' }).then(() => {
 				this.isLoading = true;
-				http.deleteSysUser(ids).then((res) => {
+				http.deleteCustomer(ids).then((res) => {
 					this.$message({ message: '删除成功', type: 'success' });
 					this.queryList();
 				}).finally(() => {
@@ -223,7 +234,6 @@ export default {
                         this.addLoading = true;
                         let para = Object.assign({}, this.form);
                         http.addCustomer(para).then((res) => {
-                            this.addLoading = false;
                             this.$message({
                                 message: '提交成功',
                                 type: 'success'
@@ -231,15 +241,35 @@ export default {
                             this.$refs['form'].resetFields();
                             this.formVisible = false;
                             this.queryList();
-                        });
+                        }).finally(() => {
+                            this.addLoading = false;
+                        })
                     });
                 }
             });
+        },
+        handleAvatarSuccess(res, file) {
+            this.form.headPic = res.filePath;
+        },
+        beforeAvatarUpload(file) {
+            const isJPG = /^image\/*/.test(file.type);
+            const isLt2M = file.size / 1024 / 1024 < 2;
+            console.log(file.type);
+            if (!isJPG) {
+                this.$message.error('上传头像图片只能是 JPG 格式!');
+            }
+            if (!isLt2M) {
+                this.$message.error('上传头像图片大小不能超过 2MB!');
+            }
+            return isJPG && isLt2M;
         },
     }
 }
 </script>
 
 <style lang="scss" scoped>
-
+.el-image {
+    width: 40px;
+    height: 40px;
+}
 </style>
