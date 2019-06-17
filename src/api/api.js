@@ -3,14 +3,19 @@ import { Message } from 'element-ui';
 
 const service = axios.create({
     baseURL: '',
-    timeout: 5000
+    timeout: 0
 });
 
 const parseQueryString = function(param) {
     if (Object.prototype.toString.call(param).slice(8, -1) == 'Object') {
-        let ret = ''
+        let ret = '';
+        if (Array.isArray(param.dateRange)) {
+            param.startTime = param.dateRange[0] ? new Date(param.dateRange[0]).format('yyyy-MM-dd HH:mm:ss') : '';
+            param.endTime = param.dateRange[1] ? new Date( param.dateRange[1]).format('yyyy-MM-dd HH:mm:ss') : '';
+            delete param.dateRange;
+        }
         for (let it in param) {
-            ret += encodeURIComponent(it) + '=' + encodeURIComponent(param[it]) + '&'
+            ret += encodeURIComponent(it) + '=' + encodeURIComponent(param[it]) + '&';
         }
         return ret;
     }
@@ -237,3 +242,10 @@ export const getInviteById = id => {
 export const exportInviteXls = (params) => {
    window.open(`/inviting/exportInvitingXls?${parseQueryString(params)}`, '_blank');
 }
+
+/**
+    角色
+ */
+ export const getRoleList = (params) => {
+     return service.post(`/sysRole/getRoleList`, params);
+ }

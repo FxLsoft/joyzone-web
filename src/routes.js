@@ -29,7 +29,7 @@ let routes = [
             },
             {
                 path: '/role',
-                component: () => import('@/views/system/role/form'),
+                component: () => import('@/views/system/role/list'),
                 name: '角色管理'
             },
         ]

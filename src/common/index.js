@@ -1,7 +1,7 @@
     /*时间格式化
     *使用方式new Date().format(yyyy-MM-dd hh:mm:ss p)
     */
-    Date.prototype.Format = function(fmt) {
+    Date.prototype.format = function(fmt) {
         var monthArray = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
         var weekArray = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
         var o = {

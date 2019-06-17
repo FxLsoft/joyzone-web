@@ -66,4 +66,9 @@ body {
 .fade-enter, .fade-leave-active {
 	opacity: 0;
 }
+.avatar-uploader {
+    img {
+        width: 100%;
+    }
+}
 </style>

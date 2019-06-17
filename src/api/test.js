@@ -28,7 +28,7 @@ function isString(obj) {
                     if (4 === _self.readyState && url.indexOf('sockjs-node') == -1) {
                         var time = new Date().getTime() - openTime;
                         console.log('%c----------------------------------------------------', 'color:blue');
-                        console.log("[接口:] " + url + "  " + tType + "  " + new Date(openTime).Format('yyyy-MM-dd HH:mm:ss') + "  " + time + "ms" + "\n[入参:] " + (isString(request) ? decodeURIComponent(request) : JSON.stringify(request)) + "\n[出参:] " + _self.responseText);
+                        console.log("[接口:] " + url + "  " + tType + "  " + new Date(openTime).format('yyyy-MM-dd HH:mm:ss') + "  " + time + "ms" + "\n[入参:] " + (isString(request) ? decodeURIComponent(request) : JSON.stringify(request)) + "\n[出参:] " + _self.responseText);
                         console.log('');
                     }
                     onreadystatechange && onreadystatechange.apply(_self, arguments);

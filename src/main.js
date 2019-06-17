@@ -12,7 +12,7 @@ import routes from "./routes";
 import "font-awesome/css/font-awesome.min.css";
 
 import VueAMap from 'vue-amap';
-console.log(VueAMap);
+// console.log(VueAMap);
 Vue.use(VueAMap);
 VueAMap.initAMapApiLoader({
     key: '1765771d9b897cad711cf533813fe6c2',

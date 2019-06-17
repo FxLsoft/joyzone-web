@@ -48,7 +48,7 @@
                         this.logining = true;
                         http.login({userName: this.form.userName, password: this.form.password}).then(res => {
                             if (res.code == 0) {
-                                sessionStorage.setItem('user', JSON.stringify(res.data));
+                                sessionStorage.setItem('user', JSON.stringify(res.data.user));
                                 this.$router.push({ path: '/' });
                             }
                         }).finally(() => {
