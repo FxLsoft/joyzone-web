@@ -28,7 +28,7 @@
 			<el-table-column prop="phone" label="手机号码" width="110"></el-table-column>
 			<el-table-column prop="address" label="地址"></el-table-column>
 			<el-table-column prop="price" label="价格"></el-table-column>
-			<el-table-column prop="type" label="店家类型" :formatter="formatType"></el-table-column>
+			<el-table-column prop="shopTypeName" label="店家类型"></el-table-column>
 			<el-table-column label="封面照片">
                 <template slot-scope="{row}">
                     <el-image :src="row.coverImg" lazy></el-image>
@@ -142,12 +142,17 @@ const Model = function (vm = {}) {
     _.status = vm.status || 0; // 店家状态；0：签约；1：待审核；2：已禁入
     _.regImg = vm.regImg || ''; // 工商注册照片
     _.legalPersonImg = vm.legalPersonImg || ''; // 法人信息照片
-    _.createTime = vm.createTime;
-    _.updateTime = vm.updateTime;
+    // _.createTime = vm.createTime;
+    // _.updateTime = vm.updateTime;
     _.shopTypeId = vm.shopTypeId;
     _.shopTypeName = vm.shopTypeName;
     _.lng = vm.lng;
     _.lat = vm.lat;
+    _.address = vm.address || '';
+    _.province = vm.province || '';
+    _.city = vm.city || '';
+    _.area = vm.area || '';
+
 }
 const MapCmp = {
     props: ['text'],
@@ -318,7 +323,7 @@ export default {
                             this.form.lat = this.mapOpt.selectMarker.position[1];
 
                         }
-                        let para = Object.assign({}, this.form);
+                        let para = new Model(this.form)
                         http[!para.id ? 'addShop' : 'updateShop'](para).then((res) => {
                             this.addLoading = false;
                             this.$message({
@@ -395,7 +400,7 @@ export default {
 
 <style lang="scss">
     .amap-wrapper {
-        width: 500px;
+        width: 100%;
         height: 300px;
         .search-box {
             position: absolute;

@@ -210,7 +210,7 @@ export default {
                 if (valid) {
                     this.$confirm('确认提交吗？', '提示', {}).then(() => {
                         this.addLoading = true;
-                        let para = Object.assign({}, this.form);
+                        let para = new Model(this.form)
                         http[!para.id ? 'addSysUser' : 'updateSysUser'](para).then((res) => {
                             this.$message({
                                 message: '提交成功',

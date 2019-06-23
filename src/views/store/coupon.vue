@@ -110,7 +110,7 @@ const Model = function (vm = {}) {
     _.backImg = vm.backImg || ''; // 活动背景图URL
     _.status = vm.status || 0; // 状态：0 失效 1 正常
     _.createTime = vm.createTime;
-    _.updateTime = vm.updateTime; //
+    // _.updateTime = vm.updateTime; //
     _.startTime = vm.startTime; // 开始时间
     _.endTime = vm.endTime; // 结束时间
     _.type = 1;
@@ -242,7 +242,7 @@ export default {
                         this.addLoading = true;
                         this.form.startTime = this.couponValidDate[0];
                         this.form.endTime = this.couponValidDate[1];
-                        let para = Object.assign({}, this.form);
+                        let para = new Model(this.form)
                         http[!para.id ? 'addShopCoupon' : 'updateShopCoupon'](para).then((res) => {
                             this.$message({
                                 message: '提交成功',
